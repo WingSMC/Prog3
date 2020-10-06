@@ -1,9 +1,8 @@
 import java.lang.Math;
 
-public class Complex {
+class Complex {
 	public static final double TAU = Math.PI * 2;
 	double re, im, arg, r;
-
 
 	Complex() {
 		this.re = 0;
@@ -34,7 +33,7 @@ public class Complex {
 		return re;
 	}
 	public void setIm(double im) {
-		this.re = im;
+		this.im = im;
 		this.r = this.abs();
 		this.arg = Math.atan2(this.im, this.re);
 	}
@@ -92,7 +91,9 @@ public class Complex {
 		return ret;
 	}
 	public Complex pow(final Complex z) {
+	    System.out.println("ln("+this+")=" + this.ln());
 		Complex ePow = z.mul(this.ln());
+	    System.out.println("ln:" + ePow);
 		Complex ret = new Complex();
 		ret.r = Math.pow(Math.E, ePow.re);
 		ret.setArg(ePow.im);
@@ -113,16 +114,12 @@ public class Complex {
 		return new Complex(this.re / scale, -this.im / scale);
 	}
 
-	/**
-	 * @return computes arg from im and re
-	 */
+
+
 	double abs() {
 		return Math.sqrt(this.sumOfSquares());
 	}
 
-	/**
-	 * @return re^2 + im^2
-	 */
 	double sumOfSquares() {
 		return this.re * this.re + this.im * this.im;
 	}
