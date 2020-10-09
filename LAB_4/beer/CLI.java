@@ -2,9 +2,9 @@ package beer;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.IOException;
 
 import java.util.Scanner;
 import java.util.Comparator;
@@ -55,7 +55,7 @@ public class CLI {
 			));
 		});
 		commands.put("delete", (List<Beer> beers, Queue<String> args) -> {
-			if(args.size() < 3) {
+			if(args.size() < 1) {
 				System.out.println("Too few arguments!");
 				return;
 			}
