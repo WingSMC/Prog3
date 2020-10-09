@@ -5,38 +5,14 @@ class Complex {
 	double re, im, arg, r;
 
 	Complex() {
-		this.re = 0;
-		this.im = 0;
 		this.r = 0;
 		this.arg = 0;
 	}
-	public Complex(double re) {
-		this(re, 0);
-	}
-	public Complex(double re, double im) {
-		this.re = re;
-		this.setIm(im);
+	public Complex(double r, double arg) {
+		this.r = r;
+		this.arg = arg;
 	}
 
-
-
-	public double getRe() {
-		return re;
-	}
-	public void setRe(double re) {
-		this.re = re;
-		this.r = this.abs();
-		this.arg = Math.atan2(this.im, this.re);
-	}
-
-	public double getIm() {
-		return re;
-	}
-	public void setIm(double im) {
-		this.im = im;
-		this.r = this.abs();
-		this.arg = Math.atan2(this.im, this.re);
-	}
 
 	public double getR() {
 		return r;
@@ -51,22 +27,14 @@ class Complex {
 		return arg;
 	}
 	public void setArg(double arg) {
-		arg = (arg + Complex.TAU) % Complex.TAU;
+		arg = arg % Complex.TAU;
 		this.arg = arg;
 		this.re = r * Math.cos(arg);
 		this.im = r * Math.sin(arg);
 	}
 
 
-
-	public Complex add(final Complex z) {
-		return new Complex(this.re + z.re, this.im + z.im);
-	}
-
-	public Complex sub(final Complex z) {
-		return new Complex(this.re - z.re, this.im - z.im);
-	}
-
+	
 	public Complex mul(double s) {
 		return new Complex(this.re * s, this.im * s);
 	}
@@ -91,9 +59,9 @@ class Complex {
 		return ret;
 	}
 	public Complex pow(final Complex z) {
-	    System.out.println("ln("+this+")=" + this.ln());
+		System.out.println("ln("+this+")=" + this.ln());
 		Complex ePow = z.mul(this.ln());
-	    System.out.println("ln:" + ePow);
+		System.out.println("ln:" + ePow);
 		Complex ret = new Complex();
 		ret.r = Math.pow(Math.E, ePow.re);
 		ret.setArg(ePow.im);
@@ -143,9 +111,6 @@ class Complex {
 	*/
 
 	public String toString() {
-		String ret = re + "";
-		if(this.im < 0) ret += im;
-		else ret += "+" + this.im;
-		return ret + "i";
+		return this.r+"e^i*"+this.arg;
 	}
 }
