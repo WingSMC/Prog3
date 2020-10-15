@@ -3,9 +3,7 @@ public class Application {
 		ConcurrentQueue fifo = new ConcurrentQueue();
 		Producer p = new Producer(fifo, "pro", 100);
 		Consumer c = new Consumer(fifo, "hai", 1000);
-		//try {
-			p.start();
-			c.start();
-		//} catch (InterruptedException e) {}
+		p.start();
+		c.start();
 	}
 }
