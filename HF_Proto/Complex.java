@@ -1,6 +1,6 @@
 import java.lang.Math;
 
-class Complex {
+/*class Complex {
 	public static final double TAU = Math.PI * 2;
 	double re, im, arg, r;
 
@@ -108,9 +108,47 @@ class Complex {
 		([\d]+(?:\.[\d]+)?)i|																			Im of algebraic		yi
 		([\d]+(?:\.[\d]+)?)|																			Re of algebraic		x
 	)$/
-	*/
+	/
 
 	public String toString() {
 		return this.r+"e^i*"+this.arg;
 	}
+}
+ */
+
+public class Complex {
+	public static final double TAU = Math.PI * 2;
+	/**
+	 * @apiNote |Z|
+	 */
+	private double r;
+	/**
+	 * @apiNote times 2π = τ
+	 */
+	private double arg;
+
+	public Complex(double arg) { this(1.0, arg); }
+	public Complex(double r, double arg) {
+		this.r = r;
+		this.arg = arg;
+	}
+
+	/**
+	 * @apiNote |Z|
+	 */
+	public double getR() { return this.r; }
+	/**
+	 * @apiNote times 2π
+	 */
+	public double getArg() { return this.arg; }
+
+	public Complex mul(double s) {
+		return new Complex(this.r * s, this.arg);
+	}
+
+	public Complex mul(final Complex z) {
+		return new Complex(this.r * z.r, this.arg + z.arg);
+	}
+
+
 }
