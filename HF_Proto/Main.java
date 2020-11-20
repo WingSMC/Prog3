@@ -1,7 +1,6 @@
-
 public class Main {
 	public static void main(String[] args) {
-		Complex test = new Complex(-1, 0).pow(new Complex(3,0));
-		System.out.println(test);
+		// Complex test = new Complex(0, 1).pow(new Complex(2, 0));
+		// System.out.println(test);
 	}
 }
