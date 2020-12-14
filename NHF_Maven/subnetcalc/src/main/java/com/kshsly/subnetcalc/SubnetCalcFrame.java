@@ -24,6 +24,9 @@ public class SubnetCalcFrame extends JFrame {
 		this.setMinimumSize(new Dimension(700, 200));
 		this.setLayout(new BorderLayout());
 
+		// Early declaration so I can set content in catch blocks
+		JTextField messages = new JTextField();
+
 		// Load data into the tree
 		try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream("networks.dat"))) {
 			this.networks = new NetworkData((Network)ois.readObject());
@@ -33,9 +36,11 @@ public class SubnetCalcFrame extends JFrame {
 				this.writeDataToFile();
 			} catch (Exception e1) {
 				e1.printStackTrace();
+				messages.setText(e.getMessage());
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
+			messages.setText(e.getMessage());
 		}
 
 
@@ -47,36 +52,38 @@ public class SubnetCalcFrame extends JFrame {
 				buttonPanel.add(addByIPButton);
 				JButton addBySizeButton = new JButton("Add by size");
 				buttonPanel.add(addBySizeButton);
+			treePanel.add(buttonPanel, BorderLayout.NORTH);
 			JTree networkTree = new JTree(this.networks);
-		treePanel.add(buttonPanel, BorderLayout.NORTH);
-		treePanel.add(new JScrollPane(networkTree), BorderLayout.CENTER);
-		JPanel rightPanel = new JPanel(new GridLayout(2,0));
-			JPanel optionsPanel = new JPanel();
-				JTextField octet1 = new JTextField(3);
-				JTextField octet2 = new JTextField(3);
-				JTextField octet3 = new JTextField(3);
-				JTextField octet4 = new JTextField(3);
-				JTextField mask = new JTextField(2);
-				optionsPanel.add(octet1);
-				optionsPanel.add(new JLabel("."));
-				optionsPanel.add(octet2);
-				optionsPanel.add(new JLabel("."));
-				optionsPanel.add(octet3);
-				optionsPanel.add(new JLabel("."));
-				optionsPanel.add(octet4);
-				optionsPanel.add(new JLabel("/"));
-				optionsPanel.add(mask);
-			JPanel addBySizePanel = new JPanel();
-				JTextField size = new JTextField(10);
-				addBySizePanel.add(new JLabel("Number of hosts: "));
-				addBySizePanel.add(size);
-		rightPanel.add(optionsPanel);
-		rightPanel.add(addBySizePanel);
-		JSplitPane mainPane = new JSplitPane(SwingConstants.VERTICAL, treePanel, rightPanel);
-		JTextField messages = new JTextField();
-			messages.setEditable(false);
+			treePanel.add(new JScrollPane(networkTree), BorderLayout.CENTER);
 
+			JPanel rightPanel = new JPanel(new GridLayout(2,0));
+				JPanel addressPanel = new JPanel();
+					JTextField octet1 = new JTextField(3);
+					JTextField octet2 = new JTextField(3);
+					JTextField octet3 = new JTextField(3);
+					JTextField octet4 = new JTextField(3);
+					JTextField mask = new JTextField(2);
+					addressPanel.add(octet1);
+					addressPanel.add(new JLabel("."));
+					addressPanel.add(octet2);
+					addressPanel.add(new JLabel("."));
+					addressPanel.add(octet3);
+					addressPanel.add(new JLabel("."));
+					addressPanel.add(octet4);
+					addressPanel.add(new JLabel("/"));
+					addressPanel.add(mask);
+				rightPanel.add(addressPanel);
+
+				JPanel addBySizePanel = new JPanel();
+					addBySizePanel.add(new JLabel("Number of hosts: "));
+					JTextField size = new JTextField(10);
+					addBySizePanel.add(size);
+				rightPanel.add(addBySizePanel);
+
+		JSplitPane mainPane = new JSplitPane(SwingConstants.VERTICAL, treePanel, rightPanel);
 		this.add(mainPane, BorderLayout.CENTER);
+			// messages textfield declared at the beginning of the ctor
+			messages.setEditable(false);
 		this.add(messages, BorderLayout.SOUTH);
 
 		// Listeners
@@ -151,22 +158,6 @@ public class SubnetCalcFrame extends JFrame {
 				messages.setText(e.getMessage());
 			}
 		});
-
-//		networkTree.addTreeSelectionListener(ev -> {
-//			try {
-//				Network selected;
-//				TreePath currentPath = null;
-//				try {
-//					currentPath = networkTree.getSelectionPath();
-//					selected = (Network) currentPath.getLastPathComponent();
-//				} catch(NullPointerException e1) {
-//					selected = (Network) networks.getRoot();
-//				}
-//			} catch (Exception e) {
-//				messages.setText(e.getMessage());
-//			}
-//		});
-
 		this.setVisible(true);
 	}
 

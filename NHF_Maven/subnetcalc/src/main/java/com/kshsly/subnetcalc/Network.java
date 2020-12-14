@@ -10,45 +10,48 @@ public class Network extends DefaultMutableTreeNode {
 	private int mask;
 	public int getMask() { return mask; }
 
-	// negat�v �rt�kek nem igaz�n �rdekelnek
+	// We don't care about negative values 👋
 	public Network(short[] octets, int integer) throws Exception {
 		this.setAddress(octets, integer);
 	}
 
 	public Network(Network superNet, long size) throws Exception {
-		if(size < 2)
-			throw new InvalidIPv4AddressException("The size should be at least 2...");
+		if(size < 2) throw new InvalidIPv4AddressException("The size should be at least 2.");
 		int neededHostBits = (int) Math.ceil(Math.log(size + 2) / Math.log(2.0));
 		this.mask = 32 - neededHostBits;
 		long bitmask = makeMask(this.mask);
-		long prevAddr = getLongFromOctets(superNet.nextFreeSubnetAddress());
-		long nextSuitableAddress = (bitmask & prevAddr) + (1L << neededHostBits);
-		
-		this.octets = getOctetsFromLong(nextSuitableAddress);
-				
+		long wcMask = makeWildcard(this.mask);
+
+		long nextFreeAddress = superNet.nextFreeSubnetAddress();
+		boolean thereIsLeftover = (wcMask & nextFreeAddress) != 0L;
+		System.out.println("NextFree: " + nextFreeAddress + "\nLeftover: " + thereIsLeftover);
+		if(thereIsLeftover)
+			nextFreeAddress = (bitmask & nextFreeAddress) + (1L << neededHostBits);
+		this.octets = getOctetsFromLong(nextFreeAddress);
+
 		if(
 			superNet.getNAddrs() - 2 < size ||
-			getLongFromOctets(superNet.nextFreeNetworkAddress()) < nextSuitableAddress + getNAddrs()
+			superNet.nextFreeNetworkAddress() < nextFreeAddress + getNAddrs()
 		) throw new InvalidIPv4AddressException("The supernet doesn't have enough addresses to contain the new one. Make sure it isn't the 0.0.0.0");
 	}
 	
-	// Number of hosts + 2 (net + broadcast)
+	// Number of hosts + 2 (net, broadcast)
 	public long getNAddrs() {
 		return (1L << (32 - mask));
 	}
 	
 	// Next free network address after this network
-	public short[] nextFreeNetworkAddress() {
-		return getOctetsFromLong(getLongFromOctets(octets) + getNAddrs());
+	public long nextFreeNetworkAddress() {
+		return getLongFromOctets(this.octets) + getNAddrs();
 	}
 	
 	// Next free network address after the last subnet's address
-	public short[] nextFreeSubnetAddress() throws Exception {
+	public long nextFreeSubnetAddress() throws Exception {
 		try {
 			Network lastChild = (Network) this.children.get(this.children.size() - 1);
 			return lastChild.nextFreeNetworkAddress();
 		} catch(Exception e) {
-			return this.getOctets();
+			return getLongFromOctets(this.octets);
 		}
 	}
 
@@ -79,10 +82,9 @@ public class Network extends DefaultMutableTreeNode {
 		return ret + octets[3] + "/" + mask;
 	}
 
-	
-	
+
 	// Static
-	private static long getLongFromOctets(short octets[]) {
+	static long getLongFromOctets(short octets[]) {
 		long acc = octets[0];
 		for(byte i = 1; i < 4; ++i) {
 			acc *= 256;
@@ -91,7 +93,7 @@ public class Network extends DefaultMutableTreeNode {
 		return acc;
 	}
 	
-	private static short[] getOctetsFromLong(long value) {
+	static short[] getOctetsFromLong(long value) {
 		short[] octets = new short[4];
 		for(byte i = 3; i > -1; --i) {
 			octets[i] = (short) (value % 256);
@@ -100,19 +102,18 @@ public class Network extends DefaultMutableTreeNode {
 		}
 		return octets;
 	}
-	
-	private static long makeMask(int mask) {
-		long rMask = 0xFFFFFFFF00000000L;
-		rMask >>>= mask;
+
+	static long makeMask(int mask) {
+		long rMask = 0xFFFFFFFFFFFFFFFFL;
+		rMask <<= (32 - mask);
 		return rMask;
 	}
 
-	private static long makeWildcard(int mask) {
+	static long makeWildcard(int mask) {
 		return makeMask(mask) ^ 0xFFFFFFFFFFFFFFFFL;
 	}
 
-	private static boolean isValidNetwork(short octets[], int mask) {
+	static boolean isValidNetwork(short octets[], int mask) {
 		return (makeWildcard(mask) & getLongFromOctets(octets)) == 0L;
 	}
-	
 }
